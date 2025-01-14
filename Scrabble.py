@@ -11,15 +11,25 @@ letter_to_points[" "] = 0
 
 
 # Function to calculate the points of a word
-def score_word(word):
-    word = word.upper()
+def score_word(word_details):
     point_total = 0
-    for letter in word:
-        point_total += letter_to_points.get(letter, 0)
-    return point_total
+    for letter in word_details[0]:
+        if letter in word_details[1]:
+            point_total += 2 * letter_to_points.get(letter, 0)
+        elif letter in word_details[2]:
+            point_total += 3 * letter_to_points.get(letter, 0)
+        else:
+            point_total += letter_to_points.get(letter, 0)
+    if word_details[3] == "Y":
+        return point_total * 2
+    elif word_details[4] == "Y":
+        return point_total * 3
+    else:
+        return point_total
 
 # Testing score_word function
-brownie_points = score_word("BROWNIE")
+# word_details = ["BROWNIE", ["N"], [], "N", "Y"]
+# brownie_points = score_word(word_details)
 # print(brownie_points)
 
 
@@ -31,16 +41,16 @@ player_to_points = {}
 
 # Calculating the points of each player and storing them in player_to_points
 def update_point_totals():
-    for player, words in player_to_words.items():
+    for player, word_detail in player_to_words.items():
         player_points = 0
-        for word in words:
+        for word in word_detail:
             player_points += score_word(word)
         player_to_points[player] = player_points
     return player_to_points
 
 # Function to add a word to a player's list of words and update their points
-def play_word(player, word):
-    player_to_words[player].append(word)
+def play_word(player, word_details):
+    player_to_words[player].append(word_details)
     return update_point_totals()
 
 # Testing play_word function
@@ -49,20 +59,20 @@ def play_word(player, word):
 
 # Adding players to the game
 # Adding the first player
-player = str(input("Player 1, please enter your player name: "))
+player = input("Player 1, please enter your player name: ")
 player_to_words[player] = []
 
 # Adding more players
 more_players = "Y"
 n = 2
-while str(more_players).upper() == "Y":
-    player = str(input("Player {}, please enter your player name: ".format(n)))
+while more_players == "Y":
+    player = input(f"Player {n}, please enter your player name: ")
     while player in player_to_words.keys():
-        player = str(input("This player name is already taken. Please enter a different name. "))
+        player = input("This player name is already taken. Please enter a different name. ")
     player_to_words[player] = []
-    more_players = input("Do you want to add more players? (Y/N) ")
-    while str(more_players).upper() not in ["Y", "N"]:
-        more_players = input("Invalid input. Please enter 'Y' or 'N'. ")
+    more_players = input("Do you want to add more players? (Y/N) ").upper()
+    while more_players not in ["Y", "N"]:
+        more_players = input("Invalid input. Please enter 'Y' or 'N'. ").upper()
     n += 1
 
 # Welcome message
@@ -75,21 +85,65 @@ for player in player_to_words.keys():
 game_on = True
 while game_on:
     for player in player_to_words.keys():
-        print("\nIt's {}'s turn.".format(player))
-        word = input("Please enter the word you want to play: ")
-        play_word(player, word)
-        print("The word {} has been added to your list of words.".format(word))
-        print("Your total points are: {}".format(player_to_points[player]))
-    game_on = input("Do you want to continue playing? (Y/N) ")
-    while str(game_on).upper() not in ["Y", "N"]:
-        game_on = input("Invalid input. Please enter 'Y' or 'N'. ")
-    if str(game_on).upper() == "N":
+        print(f"\nIt's {player}'s turn.")
+
+        # Initialising list containing word_details to be used in play_word function
+        word_details = []
+
+        # Getting word played
+        word_details.append(input("\nPlease enter the word you played: ").upper())
+
+        # Getting letters that receive double letter points
+        word_details.append(list(input("\nPlease enter the letters you received a double letter score for.\nIf you received a double letter \
+score for multiple letters, there is no need to separate them. Eg. 'AB'.\nIf you didn't receive a double letter score press enter. \n").upper()))
+
+        # Getting letters that receive double letter points
+        word_details.append(list(input("\nPlease enter the letters you received a triple letter score for.\nIf you received a triple letter \
+score for multiple letters, there is no need to separate them. Eg. 'AB'.\nIf you didn't receive a triple letter score press enter. \n").upper())) 
+
+        # Checking for double word score
+        double_word = input("\nDid you receive a double word score? (Y/N) ").upper()
+        while double_word not in ["Y", "N"]:
+            double_word = input("\nInvalid input. Please enter 'Y' or 'N'. ").upper()
+        word_details.append(double_word)
+
+        # Checking for triple word score
+        triple_word = input("\nDid you receive a triple word score? (Y/N) ").upper()
+        while triple_word not in ["Y", "N"]:
+            triple_word = input("\nInvalid input. Please enter 'Y' or 'N'. ").upper()
+        word_details.append(triple_word)
+
+        # print(word_details)
+
+        # Adding word detail to player's list of words and update their points
+        play_word(player, word_details)
+        print(f"\nThe word {word_details[0]} has been added to your list of words.")
+        print(f"You received {score_word(word_details)} points for {word_details[0]}")
+        print(f"Your total points are: {player_to_points[player]}")
+
+    # Asking if players want to continue after they have each had their turn
+    game_on = input("\nDo you want to continue playing? (Y/N) ").upper()
+    while game_on not in ["Y", "N"]:
+        game_on = input("\nInvalid input. Please enter 'Y' or 'N'. ").upper()
+    
+
+    if game_on == "N":
+        # Final scores
         print("\nThank you for playing! The final points are: ")
         for player, points in player_to_points.items():
-            print("{}: {}".format(player, points))
-        winner = max(player_to_points, key=player_to_points.get)
-        print("\nCongratulations {}! You are the winner!".format(winner))
+            print(f"{player}: {points}")
+
+        # Determining the winner
+        points = list(player_to_points.values())
+        if points.count(max(points)) > 1:    
+            print(f"\nThe game has finished in a tie!")
+        else:
+            winner = max(player_to_points, key=player_to_points.get) 
+            print(f"\nCongratulations {winner}! You are the winner!")
+            
+        # Game finishes
         break
     else:
+        # Game continues
         continue
 
