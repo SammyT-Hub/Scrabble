@@ -122,12 +122,12 @@ score for multiple letters, there is no need to separate them. Eg. 'AB'.\nIf you
         print(f"Your total points are: {player_to_points[player]}")
 
     # Asking if players want to continue after they have each had their turn
-    game_on = input("\nDo you want to continue playing? (Y/N) ").upper()
-    while game_on not in ["Y", "N"]:
-        game_on = input("\nInvalid input. Please enter 'Y' or 'N'. ").upper()
+    keep_playing = input("\nDo you want to continue playing? (Y/N) ").upper()
+    while keep_playing not in ["Y", "N"]:
+        keep_playing = input("\nInvalid input. Please enter 'Y' or 'N'. ").upper()
     
-
-    if game_on == "N":
+    # End of Game
+    if keep_playing == "N":
         # Final scores
         print("\nThank you for playing! The final points are: ")
         for player, points in player_to_points.items():
@@ -135,15 +135,17 @@ score for multiple letters, there is no need to separate them. Eg. 'AB'.\nIf you
 
         # Determining the winner
         points = list(player_to_points.values())
-        if points.count(max(points)) > 1:    
-            print(f"\nThe game has finished in a tie!")
+        if points.count(max(points)) > 1: 
+            winners = []
+            for player in player_to_points.keys():
+                if player_to_points[player] == max(points):
+                    winners.append(player)   
+            print("\nThe game has finished in a tie between the following people: ")
+            while winners != []:
+                print(f"{winners.pop()}")
         else:
             winner = max(player_to_points, key=player_to_points.get) 
             print(f"\nCongratulations {winner}! You are the winner!")
             
-        # Game finishes
-        break
-    else:
-        # Game continues
-        continue
+        game_on = False
 
