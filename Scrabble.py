@@ -1,3 +1,40 @@
+from termcolor import colored, cprint
+
+# Creating scrabble board
+board = [4, 0, 0, 1, 0, 0, 0, 4, 0, 0, 0, 1, 0, 0, 4, 5,
+    0, 3, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 3, 0, 5,
+    0, 0, 3, 0, 0, 0, 1, 0, 1, 0, 0, 0, 3, 0, 0, 5,
+    1, 0, 0, 3, 0, 0, 0, 1, 0, 0, 0, 3, 0, 0, 1, 5,
+    0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 5,
+    0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 5,
+    0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 5,
+    4, 0, 0, 1, 0, 0, 0, 3, 0, 0, 0, 1, 0, 0, 4, 5,
+    0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 5,
+    0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 5,
+    0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 5,
+    1, 0, 0, 3, 0, 0, 0, 1, 0, 0, 0, 3, 0, 0, 1, 5,
+    0, 0, 3, 0, 0, 0, 1, 0, 1, 0, 0, 0, 3, 0, 0, 5,
+    0, 3, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 3, 0, 5,
+    4, 0, 0, 1, 0, 0, 0, 4, 0, 0, 0, 1, 0, 0, 4] 
+for k in board:
+    if k == 5:
+        print('\n\n'),
+    elif k == 4:
+        cprint(' TW', 'red', attrs=[], end = ' ')
+    #print 'TW',
+    elif k == 3:
+        cprint(' DW', 'magenta', attrs=[], end = ' ')
+    #print 'DW',
+    elif k == 2:
+        cprint(' TL', 'blue', attrs=[], end = ' ')
+    #print 'TL',
+    elif k == 1:
+        cprint(' DL', 'cyan', attrs=[], end = ' ')
+    #print 'DL',
+    elif k == 0:
+        print('___', end=' ')
+
+
 # List of letters and their corresponding points in Scrabble
 letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", \
 "V", "W", "X", "Y", "Z"]
@@ -48,7 +85,7 @@ def update_point_totals():
         player_to_points[player] = player_points
     return player_to_points
 
-# Function to add a word to a player's list of words and update their points
+# Function to add a word to a player"s list of words and update their points
 def play_word(player, word_details):
     player_to_words[player].append(word_details)
     return update_point_totals()
@@ -59,7 +96,7 @@ def play_word(player, word_details):
 
 # Adding players to the game
 # Adding the first player
-player = input("Player 1, please enter your player name: ")
+player = input("\n\nPlayer 1, please enter your player name: ")
 player_to_words[player] = []
 
 # Adding more players
@@ -115,7 +152,7 @@ score for multiple letters, there is no need to separate them. Eg. 'AB'.\nIf you
 
         # print(word_details)
 
-        # Adding word detail to player's list of words and update their points
+        # Adding word detail to player"s list of words and update their points
         play_word(player, word_details)
         print(f"\nThe word {word_details[0]} has been added to your list of words.")
         print(f"You received {score_word(word_details)} points for {word_details[0]}")
