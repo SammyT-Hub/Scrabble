@@ -1,6 +1,9 @@
+# importing TWL module that contains a list of words that are valid in Scrabble
+import twl
+
 # List of letters and their corresponding points in Scrabble
-letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", \
-"V", "W", "X", "Y", "Z"]
+letters = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", \
+"v", "w", "x", "y", "z"]
 points = [1, 3, 3, 2, 1, 4, 2, 4, 1, 8, 5, 1, 3, 4, 1, 3, 10, 1, 1, 1, 1, 4, 4, 8, 4, 10]
 
 # Dictionary with the letters and their corresponding points
@@ -91,7 +94,10 @@ while game_on:
         word_details = []
 
         # Getting word played
-        word_details.append(input("\nPlease enter the word you played: ").upper())
+        word = (input("\nPlease enter the word you played: ").lower())
+        while twl.check(word) == False:
+            word = (input("\nInvalid word. Please enter a valid word: ").lower())
+        word_details.append(word)
 
         # Getting letters that receive double letter points
         word_details.append(list(input("\nPlease enter the letters you received a double letter score for.\nIf you received a double letter \
