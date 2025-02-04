@@ -95,17 +95,28 @@ while game_on:
 
         # Getting word played
         word = (input("\nPlease enter the word you played: ").lower())
+        # Checking if word is valid
         while twl.check(word) == False:
             word = (input("\nInvalid word. Please enter a valid word: ").lower())
         word_details.append(word)
 
         # Getting letters that receive double letter points
         word_details.append(list(input("\nPlease enter the letters you received a double letter score for.\nIf you received a double letter \
-score for multiple letters, there is no need to separate them. Eg. 'AB'.\nIf you didn't receive a double letter score press enter. \n").upper()))
+score for multiple letters, there is no need to separate them. Eg. 'AB'.\nIf you didn't receive a double letter score press enter. \n").lower()))
+        # Checking if letters are in word
+        while any(letter not in word for letter in word_details[1]):
+            word_details[1] = (list(input("\nInvalid input. Please enter the letters from the word you played that recieved a double letter score. \
+\nIf you received a double letter score for multiple letters, there is no need to separate them. Eg. 'AB'.\nIf you didn't receive a double letter \
+score press enter. \n").lower()))
 
-        # Getting letters that receive double letter points
+        # Getting letters that receive triple letter points
         word_details.append(list(input("\nPlease enter the letters you received a triple letter score for.\nIf you received a triple letter \
-score for multiple letters, there is no need to separate them. Eg. 'AB'.\nIf you didn't receive a triple letter score press enter. \n").upper())) 
+score for multiple letters, there is no need to separate them. Eg. 'AB'.\nIf you didn't receive a triple letter score press enter. \n").lower())) 
+        # Checking if letters are in word and not in double letter score
+        while any(letter not in word for letter in word_details[2]) or any(letter in word_details[1] for letter in word_details[2]):
+            word_details[2] = (list(input("\nInvalid input. Please enter the letters from the word you played that recieved a triple letter score. \
+\nIf you received a triple letter score for multiple letters, there is no need to separate them. Eg. 'AB'.\nIf you didn't receive a triple letter \
+score press enter. \n").lower()))
 
         # Checking for double word score
         double_word = input("\nDid you receive a double word score? (Y/N) ").upper()
