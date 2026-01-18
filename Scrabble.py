@@ -1,3 +1,10 @@
+"""
+Scrabble Calculator Project
+
+The goal of this project is to build a calculator that will accompany a game of Scrabble. This calculator can be used to keep track of scores
+and words that each player has played throughout the game. Finally, the calculator will be able to determine who has won the game at its conclusion.
+"""
+
 # importing TWL module that contains a list of words that are valid in Scrabble
 import twl
 
