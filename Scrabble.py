@@ -3,6 +3,8 @@ Scrabble Calculator Project
 
 The goal of this project is to build a calculator that will accompany a game of Scrabble. This calculator can be used to keep track of scores
 and words that each player has played throughout the game. Finally, the calculator will be able to determine who has won the game at its conclusion.
+
+Please note that I have not added any input validation to my functions as they are validated during gameplay (see # Gameplay section).
 """
 
 # importing TWL module that contains a list of words that are valid in Scrabble
@@ -25,6 +27,7 @@ def score_word(word_details: dict) -> int:
     Outputs:
     - returns the score of the word played.
     """
+
     point_total = 0
     for letter in word_details["word"]:
         if letter in word_details["blank tiles"]:
@@ -96,7 +99,23 @@ def update_point_totals(player: str, word_details: dict) -> None:
     print(f"\n{player} has played {word_details["word"]} and scored {score_word(word_details)}pts. The updated scores are:")
     for player in player_to_points_sorted:
         print(f"\t{player} {player_to_points[player]}pts")
+    print(f"\n{player}, please draw tiles to replenish your rack.")
 
+def rack_value(letters: str) -> int:
+    """
+    Calculates the total point value of a player's tile rack.
+
+    Parameters:
+    - letters: string of letters in the player's tile rack.
+
+    Outputs:
+    - returns the total point value of the letters in the player's tile rack.
+    """
+
+    point_total = 0
+    for letter in letters:
+        point_total += letter_to_points[letter]
+    return point_total
 
 
 
@@ -155,7 +174,7 @@ while game_on:
         next_move = input(f"\nIt's {player}'s turn. Do you wish to:\n\t1. play \n\t2. swap tiles \n\t3. pass\
 \n\nPlease enter the number corresponding to your choice: ")
         while next_move not in ["1", "2", "3"]:
-            next_move = input("\nInvalid input. Please enter '1', '2', or '3': ")
+            next_move = input("\nInvalid input. Please enter '1', '2', or '3': ")       
         if next_move == "2" or next_move == "3":
             print(f"\n{player} has chosen to {'swap tiles' if next_move == '2' else 'pass'}. Next player's turn.")
         else:
@@ -251,15 +270,64 @@ score press enter. \n").lower()))
                 play_word(player, word_details)
 
 
-    # Asking if players want to continue after they have each had their turn
-    keep_playing = input("\nDo you want to continue playing? (Y/N) ").upper()
-    while keep_playing not in ["Y", "N"]:
-        keep_playing = input("\nInvalid input. Please enter 'Y' or 'N'. ").upper()
+            # Checking if player's tile rack is empty
+            empty_rack = input("\nIs your tile rack empty (Y/N) ").upper()
+            while empty_rack not in ["Y", "N"]:
+                empty_rack = input("\nInvalid input. Please enter 'Y' or 'N'. ").upper()
+                
+            # Calculating the remaining values on each player's rack, and subtracting these from their final scores
+            if empty_rack == "Y":
+
+                # Creating a copy of player's points prior to adjusting scores for tiles remaining on racks. 
+                # This will be used to determine the winner in case of a tiebreak.
+                player_to_points_copy = player_to_points.copy()  
+
+                # List of the other players who have tiles remaining on their racks
+                other_players = list(player_to_points.keys()).remove(player)
+                    
+                for other_player in other_players:
+
+                    # Getting letters in other player's tile rack
+                    rack_letters = input(f"\nPlease enter upto 7 letters in {other_player}'s tile rack.\nThere is \
+                        no need to separate letters with a space. Once letters have been entered press 'Enter'.").lower()
+                    while rack_letters.isalpha() == False or len(rack_letters) > 7:
+                        if rack_letters.isalpha() == False:
+                            rack_letters = input(f"\nInvalid input. Your entry must only include letters from the alphabet. \
+                                There is no need to separate letters with a space. Once letters have been entered press 'Enter'.").lower()
+                        else:
+                            rack_letters = input(f"\nInvalid input. A tile rack can only hold a maximum of 7 letters. \
+                            Please re-enter the letters in {other_player}'s tile rack. There is no need to separate letters \
+                            with a space. Once letters have been entered press 'Enter'.").lower()
+                        
+                    # Calculating value of other player's tile rack
+                    total_rack_value = rack_value(rack_letters)
+                        
+                    # Subtracting value of other player's tile rack from their score and adding it to current player's score
+                    player_to_points[other_player] -= total_rack_value
+                    player_to_points[player] += total_rack_value
+
+                    # Sorting leaderboard
+                    player_to_points_sorted = sorted(player_to_points, key = player_to_points.get, reverse = True)
+
+                    # Printing message with updated scores
+                    print(f"\nThe total point value of {other_player}'s tile rack is {total_rack_value}pts. Subtracting this from \
+                          {other_player}'s score and adding it to {player}'s score gives us the updated scores:")
+                    for p in player_to_points_sorted:
+                        print(f"\t{p} {player_to_points[p]}pts")
+                        
+                break  # Exiting for loop as game has ended
+
+
+    # Determining if game continues after each player has had their turn
+    if empty_rack != "Y":
+        keep_playing = input("\n Do you want to continue playing? (Y/N) ").upper()
+        while keep_playing not in ["Y", "N"]:
+            keep_playing = input("\nInvalid input. Please enter 'Y' or 'N'. ").upper()
     
 
 
     # End of Game
-    if keep_playing == "N":
+    if keep_playing == "N" or empty_rack == "Y":
 
         # Determining winner(s).
         winners = [player for player in player_to_points.keys() if player_to_points[player] == max(player_to_points.values())]
@@ -273,7 +341,25 @@ score press enter. \n").lower()))
             print(f"The winners are ...")
             for player in winners:
                 print(f"\t{player}")
-            print(f"\nCongratulations! Thank you all for playing:)")
+
+            countback = input("\nWe have a tie! Do you want to use the countback method to determine a single winner? (Y/N) ").upper()
+            while countback not in ["Y", "N"]:
+                countback = input("\nInvalid input. Please enter 'Y' or 'N'. ").upper()
+            
+            # Determining winner using countback method
+            if countback == "Y":
+                for player in winners:
+                    print(f"\n{player}'s score before adjusting for tiles remaining on rack: {player_to_points_copy[player]}pts")
+                # if len(set([player_to_points_copy[player] for player in winners])) == 1:
+                #     print("\nThe scores before adjusting for tiles remaining on rack are also tied. The game will remain a tie.")
+                #     game_on = False
+                #     break
+                print(f"\nThe winner after countback is ...\n\t{winner}\n\nCongratulations! Thank you all for playing:)")
+            
+            # Game will end in a tie
+            else:
+                print(f"\nThe game will remain a tie. Congratulations! Thank you all for playing:)")
             
         game_on = False
 
+# Need to add tiebreak
